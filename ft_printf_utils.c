@@ -6,7 +6,7 @@
 /*   By: fharifen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/25 09:24:17 by fharifen          #+#    #+#             */
-/*   Updated: 2024/03/26 12:06:55 by fharifen         ###   ########.fr       */
+/*   Updated: 2024/03/26 21:33:07 by fharifen         ###   ########.mg       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,7 @@ int	print_str(char *str)
 	count = 0;
 	while (str[i])
 	{
-		print_char(str[i]);
-		count++;
+		count += print_char(str[i]);
 		i++;
 	}
 	return (count);
@@ -44,40 +43,50 @@ int print_nbr(long nbr, char format)
 	if (nbr < 0)
 	{
 		nbr = -nbr;
-		print_char('-');
+		count += print_char('-');
 	}
 	if (nbr > 9)
 	{
 		print_nbr((nbr / 10), format);
-		print_char((nbr % 10) + '0');
+		count += print_char((nbr % 10) + '0');
 	}
 	else
-		print_char(nbr + '0');
+		count += print_char(nbr + '0');
 	return (count);
 }
 
 int print_hex(long n, char format)
 {
-	int count;
+	static int count;
 	char *str;
 	unsigned int	nbr;
 
 	nbr = (unsigned int)n;
-	if (format == 'p')
-	{
-		print_str("0x");
-	}
-	if (format == 'x')
-		str = "0123456789abcdef";
-	else if (format == 'X')
-		str = "0123456789ABCDEF";
 	count = 0;
+	str = "0123456789abcdef";
+	if (format == 'X')
+		str = "0123456789ABCDEF";
 	if (nbr > 16)
 	{
 		print_hex((nbr / 16), format);
-		print_char(str[nbr % 16]);
+		count += print_char(str[nbr % 16]);
 	}
 	else
-		print_char(str[nbr]);
+		count += print_char(str[nbr]);
+	return (count);
+}
+
+int	print_ptr(void *n)
+{
+	int	count;
+	unsigned long int	ptr;
+
+	ptr = (unsigned long int)n;
+	if (!ptr)
+		return (0);
+	count = 0;
+	print_str("0x");
+	count += 2;
+	count += print_hex(ptr, 'x');
 	return (count);
 }
