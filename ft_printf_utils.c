@@ -6,87 +6,81 @@
 /*   By: fharifen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/25 09:24:17 by fharifen          #+#    #+#             */
-/*   Updated: 2024/03/26 21:33:07 by fharifen         ###   ########.mg       */
+/*   Updated: 2024/03/27 16:37:37 by fharifen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-int	print_char(char c)
+void	print_char(char c, int *count)
 {
 	write(1, &c, 1);
-	return (1);
+	(*count)++;
 }
 
-int	print_str(char *str)
+void	print_str(char *str, int *count)
 {
 	int	i;
-	int	count;
 
 	i = 0;
-	count = 0;
+	if (str == NULL)
+	{
+		write(1, "(null)", 6);
+		*count = *count + 6;
+		return ;
+	}
 	while (str[i])
 	{
-		count += print_char(str[i]);
+		print_char(str[i], count);
 		i++;
 	}
-	return (count);
 }
 
-int print_nbr(long nbr, char format)
+void	print_nbr(long nbr, char format, int *count)
 {
-	int count;
-
-	count = 0;
 	if (format == 'u')
 		nbr = (unsigned int)nbr;
 	if (nbr < 0)
 	{
 		nbr = -nbr;
-		count += print_char('-');
+		print_char('-', count);
 	}
 	if (nbr > 9)
 	{
-		print_nbr((nbr / 10), format);
-		count += print_char((nbr % 10) + '0');
+		print_nbr((nbr / 10), format, count);
+		print_char((nbr % 10) + '0', count);
 	}
 	else
-		count += print_char(nbr + '0');
-	return (count);
+		print_char(nbr + '0', count);
 }
 
-int print_hex(long n, char format)
+void	print_hex(unsigned long nbr, char format, int *count)
 {
-	static int count;
 	char *str;
-	unsigned int	nbr;
 
-	nbr = (unsigned int)n;
-	count = 0;
 	str = "0123456789abcdef";
 	if (format == 'X')
 		str = "0123456789ABCDEF";
-	if (nbr > 16)
+	if (nbr > 15)
 	{
-		print_hex((nbr / 16), format);
-		count += print_char(str[nbr % 16]);
+		print_hex((nbr / 16), format, count);
+		print_char(str[nbr % 16], count);
 	}
 	else
-		count += print_char(str[nbr]);
-	return (count);
+		print_char(str[nbr], count);
 }
 
-int	print_ptr(void *n)
+void	print_ptr(void *n, int *count)
 {
-	int	count;
-	unsigned long int	ptr;
+	unsigned long ptr;
 
-	ptr = (unsigned long int)n;
-	if (!ptr)
-		return (0);
-	count = 0;
-	print_str("0x");
-	count += 2;
-	count += print_hex(ptr, 'x');
-	return (count);
+	ptr = (unsigned long)n;
+	if (ptr == 0)
+	{
+		write(1, "(nil)", 5);
+		*count += 5;
+		return ;
+	}
+	print_str("0x", count);
+	print_hex(ptr, 'x', count);
 }
